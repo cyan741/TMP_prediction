@@ -1,0 +1,48 @@
+{
+  "workflow": "predict",
+  "model": "tcrlm",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/tcrLM",
+  "python": "/opt/conda/bin/python3.11",
+  "output": "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_predict",
+  "input_rows": 11834,
+  "input_peptides": 500,
+  "dependencies": [
+    "torch",
+    "einops",
+    "numpy",
+    "pandas",
+    "sklearn"
+  ],
+  "predict_uses_labels": false,
+  "paths_relative_to": "configuration directory",
+  "missing_assets": [
+    "/root/TMP_prediction/baseline_runs/repos/tcrLM/pretrained_model/finetuned_model.bin"
+  ],
+  "model_inputs": [
+    "peptide",
+    "single CDR3"
+  ],
+  "chain": "beta",
+  "ignored_model_inputs": [
+    "MHC",
+    "other TCR chain"
+  ],
+  "mask_width": 20,
+  "test_projection_conflicts": 2,
+  "threshold_selection": "checkpoint metadata, explicit threshold, or upstream 0.5 for raw state_dict",
+  "python_exists": true,
+  "stages": [
+    {
+      "stage": "predict",
+      "argv": [
+        "/opt/conda/bin/python3.11",
+        "/root/Agentic-TPH-training-code/baselines/workers/tcrlm.py",
+        "--request",
+        "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_predict/predict_request.json"
+      ],
+      "cwd": "/root/TMP_prediction/baseline_runs/repos/tcrLM"
+    }
+  ],
+  "input_sha256": "fabc7666a45b90c09be93ba05c71f3f02fe9975afcac7cc26d8ecc0d03e5dbb4",
+  "repo_commit": "6c96f6997666214ebc7ac5dae213d127414417e9"
+}

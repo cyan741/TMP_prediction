@@ -1,0 +1,10 @@
+{
+  "model": "tcrlm",
+  "workflow": "predict",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/tcrLM",
+  "python": "/opt/conda/bin/python",
+  "input": "../../workspaces/unseen_full_seed42_original/hitph/test_data_fold0.csv",
+  "checkpoint": "/root/TMP_prediction/baseline_runs/repos/tcrLM/pretrained_model/finetuned_model.bin",
+  "output": "../../outputs/baselines/tcrlm_direct",
+  "settings": {"chain": "beta", "batch_size": 64, "device": "cuda", "mask_width": 20}
+}

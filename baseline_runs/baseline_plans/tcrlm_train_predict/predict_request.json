@@ -1,0 +1,21 @@
+{
+  "model": "tcrlm",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/tcrLM",
+  "settings": {
+    "chain": "beta",
+    "seed": 42,
+    "negative_seed": 42,
+    "batch_size": 64,
+    "epochs": 35,
+    "patience": 5,
+    "learning_rate": 0.001,
+    "device": "cuda",
+    "mask_width": 20,
+    "unsupported_train": "exclude"
+  },
+  "stage": "predict",
+  "input": "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_train_predict/data/input.csv",
+  "checkpoint": "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_train_predict/model/best.pt",
+  "threshold": null,
+  "output": "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_train_predict/worker_predictions.csv"
+}

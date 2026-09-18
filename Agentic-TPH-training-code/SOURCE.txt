@@ -1,0 +1,4 @@
+Source repository: Yuyanzh04/Agentic-HiTph
+Source commit: a052f4f7e69f14f046a5470d76e5d04cc74a0563
+Native model/loop retained; standalone package omits agent orchestration. Shared split utilities extracted from corrected 2026-09-06 campaign.
+Package features: User-facing CLI, readable formatting and standalone unlabeled inference.

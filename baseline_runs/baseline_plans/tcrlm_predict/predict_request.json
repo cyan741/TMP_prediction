@@ -1,0 +1,15 @@
+{
+  "model": "tcrlm",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/tcrLM",
+  "settings": {
+    "chain": "beta",
+    "batch_size": 64,
+    "device": "cuda",
+    "mask_width": 20
+  },
+  "stage": "predict",
+  "input": "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_predict/data/input.csv",
+  "checkpoint": "/root/TMP_prediction/baseline_runs/repos/tcrLM/pretrained_model/finetuned_model.bin",
+  "threshold": null,
+  "output": "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_predict/worker_predictions.csv"
+}

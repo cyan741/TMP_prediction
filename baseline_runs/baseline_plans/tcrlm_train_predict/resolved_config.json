@@ -1,0 +1,26 @@
+{
+  "model": "tcrlm",
+  "workflow": "train-predict",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/tcrLM",
+  "python": "/opt/conda/bin/python3.11",
+  "workspace": "/root/Agentic-TPH-training-code/workspaces/unseen_full_seed42_original/hitph",
+  "input": "/root/Agentic-TPH-training-code/workspaces/unseen_full_seed42_original/hitph/test_data_fold0.csv",
+  "init_checkpoint": "/root/TMP_prediction/baseline_runs/repos/tcrLM/pretrained_model/pretrained_model_tcr.bin",
+  "init_kind": "pretrain",
+  "output": "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_train_predict",
+  "settings": {
+    "chain": "beta",
+    "seed": 42,
+    "negative_seed": 42,
+    "batch_size": 64,
+    "epochs": 35,
+    "patience": 5,
+    "learning_rate": 0.001,
+    "device": "cuda",
+    "mask_width": 20,
+    "unsupported_train": "exclude"
+  },
+  "train": "/root/Agentic-TPH-training-code/workspaces/unseen_full_seed42_original/hitph/train_data_fold0.csv",
+  "valid": "/root/Agentic-TPH-training-code/workspaces/unseen_full_seed42_original/hitph/valid_data_fold0.csv",
+  "negative_exclusion": "/root/Agentic-TPH-training-code/workspaces/unseen_full_seed42_original/hitph/negative_blacklist_corpus.csv"
+}

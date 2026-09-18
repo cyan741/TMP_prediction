@@ -1,0 +1,17 @@
+{
+  "static_data_only": true,
+  "model_executed": false,
+  "prediction_input_label_free": true,
+  "prediction_rows": 11834,
+  "requests_written": true,
+  "training_rows": 213834,
+  "validation_rows": 11691,
+  "train_validation_test_peptide_counts": [
+    2337,
+    500,
+    500
+  ],
+  "train_negative_exclusion_verified": true,
+  "training_only_donors": true,
+  "training_excluded_rows": 1
+}

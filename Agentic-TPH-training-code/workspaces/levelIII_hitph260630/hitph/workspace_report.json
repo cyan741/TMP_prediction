@@ -1,0 +1,29 @@
+{
+  "level": "III",
+  "backend": "hla-i",
+  "pep_max_len": 13,
+  "tcr_max_len": 28,
+  "task": "immrep23",
+  "grouping": "pair_stratified",
+  "test_grouping": "pair_stratified",
+  "reference": "hitph",
+  "split_seed": 42,
+  "validation_negative_seed": 1042,
+  "capability_filter": {
+    "peptide_too_long": 0,
+    "peptide_too_short": 0,
+    "peptide_not_amino_acid": 0,
+    "hla_length_mismatch": 0,
+    "alpha_too_long": 0,
+    "beta_too_long": 0,
+    "chain_missing": 0
+  },
+  "negative_exclusion": "train positives + all validation/test pair groups; expanded to model pool; peptide-only across MHC",
+  "split_protocol": "potential-endpoint-pair-v1",
+  "train_rows": 95145,
+  "train_unique_pairs": 75422,
+  "valid_rows": 16646,
+  "test_rows": 24084,
+  "train_peptides": 3125,
+  "training_duplicates_retained": 19723
+}

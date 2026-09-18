@@ -1,0 +1,72 @@
+{
+  "workflow": "train-predict",
+  "model": "tcrlm",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/tcrLM",
+  "python": "/opt/conda/bin/python3.11",
+  "output": "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_train_predict",
+  "input_rows": 11834,
+  "input_peptides": 500,
+  "dependencies": [
+    "torch",
+    "einops",
+    "numpy",
+    "pandas",
+    "sklearn"
+  ],
+  "predict_uses_labels": false,
+  "paths_relative_to": "configuration directory",
+  "missing_assets": [
+    "/root/TMP_prediction/baseline_runs/repos/tcrLM/pretrained_model/pretrained_model_tcr.bin"
+  ],
+  "model_inputs": [
+    "peptide",
+    "single CDR3"
+  ],
+  "chain": "beta",
+  "ignored_model_inputs": [
+    "MHC",
+    "other TCR chain"
+  ],
+  "mask_width": 20,
+  "test_projection_conflicts": 2,
+  "training_excluded_csv_rows": [
+    29278
+  ],
+  "training_kept_rows": 106917,
+  "train_source_rows": 106918,
+  "valid_rows": 11691,
+  "train_peptides": 2337,
+  "valid_peptides": 500,
+  "validation_projection_conflicts": 15,
+  "training_negatives": "fixed 1:1 if train is positive-only; exclusion projected to selected chain",
+  "selection_metric": "validation AUROC",
+  "threshold_selection": "validation MCC; frozen before test",
+  "python_exists": true,
+  "stages": [
+    {
+      "stage": "train",
+      "argv": [
+        "/opt/conda/bin/python3.11",
+        "/root/Agentic-TPH-training-code/baselines/workers/tcrlm.py",
+        "--request",
+        "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_train_predict/train_request.json"
+      ],
+      "cwd": "/root/TMP_prediction/baseline_runs/repos/tcrLM"
+    },
+    {
+      "stage": "predict",
+      "argv": [
+        "/opt/conda/bin/python3.11",
+        "/root/Agentic-TPH-training-code/baselines/workers/tcrlm.py",
+        "--request",
+        "/root/Agentic-TPH-training-code/baseline_plans/tcrlm_train_predict/predict_request.json"
+      ],
+      "cwd": "/root/TMP_prediction/baseline_runs/repos/tcrLM"
+    }
+  ],
+  "input_sha256": "fabc7666a45b90c09be93ba05c71f3f02fe9975afcac7cc26d8ecc0d03e5dbb4",
+  "repo_commit": "6c96f6997666214ebc7ac5dae213d127414417e9",
+  "training_prepared_rows": 213834,
+  "train_sha256": "64844ea48b1b60290ca4b4dced4c676642ffbd3e4130ae3fda017e40304ab16d",
+  "valid_sha256": "d6e71e59fb5018ecce74928332ddb1d47771aeccb14723dcc50f74ef4faeff0a"
+}

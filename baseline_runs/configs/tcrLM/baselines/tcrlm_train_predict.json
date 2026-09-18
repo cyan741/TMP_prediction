@@ -1,0 +1,23 @@
+{
+  "model": "tcrlm",
+  "workflow": "train-predict",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/tcrLM",
+  "python": "/opt/conda/bin/python",
+  "workspace": "../../workspaces/unseen_full_seed42_original/hitph",
+  "input": "../../workspaces/unseen_full_seed42_original/hitph/test_data_fold0.csv",
+  "init_checkpoint": "/root/TMP_prediction/baseline_runs/repos/tcrLM/pretrained_model/pretrained_model_tcr.bin",
+  "init_kind": "pretrain",
+  "output": "../../outputs/baselines/tcrlm_trained_s42",
+  "settings": {
+    "chain": "beta",
+    "seed": 42,
+    "negative_seed": 42,
+    "batch_size": 64,
+    "epochs": 35,
+    "patience": 5,
+    "learning_rate": 0.001,
+    "device": "cuda",
+    "mask_width": 20,
+    "unsupported_train": "exclude"
+  }
+}

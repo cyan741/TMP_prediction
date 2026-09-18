@@ -1,0 +1,22 @@
+{
+  "output": "./workspaces/levelIII_hitph260630_cluster",
+  "level": "III",
+  "backend": "hla-i",
+  "task": "unseen-cluster",
+  "validation_grouping": "cluster",
+  "test_grouping": "cluster",
+  "reference": "hitph",
+  "validation_fraction": 0.1,
+  "split_seed": 42,
+  "validation_negative_seed": 1042,
+  "corpora": {
+    "hitph": {
+      "path": "./corpora/hitph260630.csv",
+      "format": "canonical"
+    }
+  },
+  "test": {
+    "path": "/home/luyq/panmhc-2606release/A_level3_panmhc/fixed-benchmarks/human_I/human_I_test.csv",
+    "format": "canonical"
+  }
+}
