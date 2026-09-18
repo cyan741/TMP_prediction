@@ -1,0 +1,10 @@
+{"encoding": "peptide", "completed": 64, "total": 353}
+{"encoding": "tcr", "completed": 64, "total": 2419}
+{"features_abs_mean": 0.7437782287597656, "features_abs_max": 33.531898498535156, "features_std": 1.0}
+{"lr": 0.0001, "batch": 2048, "initial_loss": 0.693146288394928}
+{"lr": 0.0001, "batch": 2048, "epoch": 1, "online_train_loss": 0.8230206094023421, "end_train_loss": 0.709805965423584}
+{"lr": 0.0001, "batch": 2048, "epoch": 3, "online_train_loss": 0.7683595867930357, "end_train_loss": 0.7155007123947144}
+{"lr": 0.0001, "batch": 2048, "epoch": 5, "online_train_loss": 0.7235172830037973, "end_train_loss": 0.7075659036636353}
+{"lr": 0.0001, "batch": 2048, "epoch": 10, "online_train_loss": 0.6751323005136305, "end_train_loss": 0.6823911666870117}
+{"lr": 0.0001, "batch": 2048, "epoch": 15, "online_train_loss": 0.6640662170935678, "end_train_loss": 0.6626277565956116}
+{"export_max_logit_error": 3.5762786865234375e-07}

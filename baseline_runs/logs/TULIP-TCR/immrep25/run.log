@@ -1,0 +1,5 @@
+{
+  "predictions": "/root/TMP_prediction/baseline_runs/predictions/TULIP-TCR/immrep25/predictions.csv",
+  "metrics": "/root/TMP_prediction/baseline_runs/predictions/TULIP-TCR/immrep25/metrics.json",
+  "rows": 8938
+}

@@ -1,0 +1,110 @@
+{
+  "overall": {
+    "rows": 11834,
+    "peptides": 500,
+    "positives": 5930,
+    "negatives": 5904,
+    "auroc": 0.7679074723399004,
+    "auprc": 0.7534408053533976,
+    "f1": 0.7685444133706218,
+    "mcc": 0.48724019330919843,
+    "macro_peptide_auroc": 0.8438176091800859,
+    "macro_peptide_auprc": 0.8895863096816936,
+    "macro_eligible_peptides": 500
+  },
+  "by_edit_distance": {
+    "1": {
+      "rows": 5306,
+      "peptides": 300,
+      "positives": 2655,
+      "negatives": 2651,
+      "auroc": 0.8665570537643117,
+      "auprc": 0.8741868410489796,
+      "f1": 0.79601832832991,
+      "mcc": 0.5559069190982816,
+      "macro_peptide_auroc": 0.940797446548713,
+      "macro_peptide_auprc": 0.9566621859651855,
+      "macro_eligible_peptides": 300
+    },
+    "2": {
+      "rows": 150,
+      "peptides": 29,
+      "positives": 75,
+      "negatives": 75,
+      "auroc": 0.7770666666666667,
+      "auprc": 0.7589843998412162,
+      "f1": 0.7352941176470588,
+      "mcc": 0.4034732923929645,
+      "macro_peptide_auroc": 0.7603448275862069,
+      "macro_peptide_auprc": 0.8559143962439295,
+      "macro_eligible_peptides": 29
+    },
+    "3": {
+      "rows": 643,
+      "peptides": 25,
+      "positives": 322,
+      "negatives": 321,
+      "auroc": 0.6068574524486756,
+      "auprc": 0.5444120525860423,
+      "f1": 0.7450523864959255,
+      "mcc": 0.42821508364336686,
+      "macro_peptide_auroc": 0.8295753258105182,
+      "macro_peptide_auprc": 0.8837157663454953,
+      "macro_eligible_peptides": 25
+    },
+    "4": {
+      "rows": 568,
+      "peptides": 55,
+      "positives": 284,
+      "negatives": 284,
+      "auroc": 0.7072381471930173,
+      "auprc": 0.6756944812342296,
+      "f1": 0.7544097693351425,
+      "mcc": 0.45127284765538583,
+      "macro_peptide_auroc": 0.6705780557293207,
+      "macro_peptide_auprc": 0.7716759692234842,
+      "macro_eligible_peptides": 55
+    },
+    "5": {
+      "rows": 5101,
+      "peptides": 79,
+      "positives": 2561,
+      "negatives": 2540,
+      "auroc": 0.6432698072541791,
+      "auprc": 0.5552216072240841,
+      "f1": 0.7480534743646247,
+      "mcc": 0.4348440891897814,
+      "macro_peptide_auroc": 0.6336883610906904,
+      "macro_peptide_auprc": 0.7378197504400552,
+      "macro_eligible_peptides": 79
+    },
+    "6": {
+      "rows": 60,
+      "peptides": 11,
+      "positives": 30,
+      "negatives": 30,
+      "auroc": 0.7233333333333334,
+      "auprc": 0.6647679211312908,
+      "f1": 0.8,
+      "mcc": 0.5773502691896257,
+      "macro_peptide_auroc": 0.8427588383838384,
+      "macro_peptide_auprc": 0.8646599927849927,
+      "macro_eligible_peptides": 11
+    },
+    "7": {
+      "rows": 6,
+      "peptides": 1,
+      "positives": 3,
+      "negatives": 3,
+      "auroc": 0.6666666666666667,
+      "auprc": 0.6388888888888888,
+      "f1": 0.8571428571428571,
+      "mcc": 0.7071067811865476,
+      "macro_peptide_auroc": 0.6666666666666667,
+      "macro_peptide_auprc": 0.6388888888888888,
+      "macro_eligible_peptides": 1
+    }
+  },
+  "threshold_source": "prediction CSV; must be frozen on validation data",
+  "aggregation": "row-pooled and equally weighted per-peptide metrics; single-label groups return null AUC"
+}

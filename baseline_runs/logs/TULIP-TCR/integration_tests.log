@@ -1,0 +1,28 @@
+.
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+.........
+----------------------------------------------------------------------
+Ran 10 tests in 0.705s
+
+OK
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.015s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.082s
+
+OK
+{"encoding": "peptide", "completed": 2, "total": 3}
+{"encoding": "tcr", "completed": 2, "total": 3}
+.{"encoding": "peptide", "completed": 2, "total": 3}
+{"encoding": "tcr", "completed": 2, "total": 3}
+.{"encoding": "peptide", "completed": 2, "total": 3}
+{"encoding": "tcr", "completed": 2, "total": 3}
+.
+----------------------------------------------------------------------
+Ran 3 tests in 0.391s
+
+OK

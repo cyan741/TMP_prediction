@@ -1,0 +1,26 @@
+{
+  "source": "https://raw.githubusercontent.com/Lee-CBG/ATM-TCR/a1e02e17d657626d3aa091bf0c92fc7ca8c9c924/models/original.ckpt",
+  "official_repo": "https://github.com/Lee-CBG/ATM-TCR",
+  "upstream_commit": "a1e02e17d657626d3aa091bf0c92fc7ca8c9c924",
+  "local_path": "/root/TMP_prediction/baseline_runs/repos/ATM-TCR/models/original.ckpt",
+  "sha256": "1c3aca56f3df833c33ee3984e5b616b97fcd04dc52c2c41ae828d840e113ff09",
+  "bytes": 17086682,
+  "selected_weight_shapes": {
+    "embedding.weight": [
+      26,
+      25
+    ],
+    "net.0.weight": [
+      2048,
+      1050
+    ],
+    "net.4.weight": [
+      1024,
+      2048
+    ],
+    "net.8.weight": [
+      1,
+      1024
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "model": "atm-tcr",
+  "chain": "beta",
+  "architecture": {
+    "max_len_pep": 22,
+    "max_len_tcr": 20,
+    "heads": 5,
+    "lin_size": 1024,
+    "drop_rate": 0.25,
+    "padding": "mid",
+    "blosum": null
+  },
+  "threshold": 0.225,
+  "validation_mcc": 0.473520324157667,
+  "best_epoch": 7,
+  "validation_auroc": 0.7743356885425201,
+  "seed": 42,
+  "negative_seed": 42,
+  "selection_metric": "validation AUROC",
+  "threshold_selection": "maximum validation MCC",
+  "training_negatives": "dynamic 1:1 screened beta mismatches",
+  "upstream_attention_sha256": "33ee125a126236c5a64d4471c2d499e23d6c62766bd170c16faa41bad857d7d1",
+  "upstream_preprocessing_sha256": "830912bbfe851cbca2a5548d564d099de3e9708f3c68f870f1e6d15e14cfd05b"
+}

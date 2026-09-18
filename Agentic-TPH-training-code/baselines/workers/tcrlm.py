@@ -10,7 +10,6 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 import numpy as np
 import pandas as pd
 from core_engine.trainer.workspaces import write_json
-from baselines.provenance import sha256
 
 
 def load_model_class(repo, mask_width):
@@ -49,7 +48,7 @@ def encode(frame,vocab):
 
 def state_dict(payload):
     raw=payload.get('state_dict',payload.get('model_state_dict',payload))
-    return {k.removeprefix('module.'):v for k,v in raw.items()}
+    return {(k[7:] if k.startswith('module.') else k):v for k,v in raw.items()}
 
 
 def initialize(model,payload,kind):
@@ -57,7 +56,7 @@ def initialize(model,payload,kind):
     if kind=='finetuned':
         model.load_state_dict(raw,strict=True)
     elif kind=='pretrain':
-        raw={k.removeprefix('protflash.'):v for k,v in raw.items() if not k.startswith('fc_out.')}
+        raw={(k[10:] if k.startswith('protflash.') else k):v for k,v in raw.items() if not k.startswith('fc_out.')}
         model.encoder_T.load_state_dict(raw,strict=True)
         model.encoder_P.load_state_dict(raw,strict=True)
     else:
@@ -74,21 +73,89 @@ def predict_scores(model,arrays,batch_size,device):
     return np.array(result)
 
 
+def frozen_features(model, train, valid, vocab, batch_size, device, standardize=False):
+    """Encode each distinct sequence once; upstream fine-tuning freezes encoders."""
+    import torch
+    tables=[]; indices=[]; means=[]; scales=[]
+    model.eval()
+    for column,encoder in [('peptide',model.encoder_P),('tcr',model.encoder_T)]:
+        values=list(dict.fromkeys(train[column].tolist()+valid[column].tolist()))
+        lookup={value:i for i,value in enumerate(values)}
+        tokens=np.array([[vocab[c] for c in value.ljust(34,'-')] for value in values],dtype=np.int64)
+        lengths=np.array([len(value) for value in values],dtype=np.int64)
+        table=torch.empty((len(values),34*512),dtype=torch.float32)
+        with torch.no_grad():
+            for start in range(0,len(values),batch_size):
+                x=torch.as_tensor(tokens[start:start+batch_size],device=device)
+                n=torch.as_tensor(lengths[start:start+batch_size],device=device)
+                table[start:start+len(x)]=encoder(x,n).reshape(len(x),-1).cpu()
+                if start % (batch_size*100)==0:
+                    print(json.dumps(dict(encoding=column,completed=start+len(x),total=len(values))),flush=True)
+        train_ids=np.array([lookup[v] for v in train[column]],dtype=np.int64)
+        if standardize:
+            # Weighted by TRAIN occurrences; validation-only sequences have zero weight.
+            weights=torch.as_tensor(np.bincount(train_ids,minlength=len(values)),dtype=torch.float64)
+            mean=torch.empty(table.shape[1]);scale=torch.empty_like(mean)
+            for start in range(0,table.shape[1],512):
+                block=table[:,start:start+512].double()
+                mu=block.T.mv(weights)/len(train)
+                variance=(block-mu).square().T.mv(weights)/len(train)
+                sigma=variance.sqrt()
+                sigma=torch.where(sigma>1e-3,sigma,torch.ones_like(sigma))
+                mean[start:start+512]=mu.float();scale[start:start+512]=sigma.float()
+            table.sub_(mean).div_(scale)
+            means.append(mean);scales.append(scale)
+        tables.append(table)
+        indices.append([train_ids,np.array([lookup[v] for v in valid[column]],dtype=np.int64)])
+    def features(rows, split):
+        return torch.cat([table[index[split][rows]] for table,index in zip(tables,indices)],dim=1).to(device)
+    if standardize:
+        features.mean=torch.cat(means).to(device)
+        features.scale=torch.cat(scales).to(device)
+    return features
+
+
+def export_state(model, features):
+    """Fold training standardization into the original linear head for inference."""
+    state=model.state_dict()
+    if hasattr(features,'mean'):
+        weight=model.classifier.weight.detach()/features.scale
+        state['classifier.weight']=weight
+        state['classifier.bias']=model.classifier.bias.detach()-weight @ features.mean
+    return state
+
+
+def classifier_scores(model, features, size, batch_size):
+    import torch
+    result=[]
+    with torch.no_grad():
+        for start in range(0,size,batch_size):
+            rows=np.arange(start,min(size,start+batch_size))
+            result.extend(torch.softmax(model.classifier(features(rows,1)),dim=1)[:,1].cpu().tolist())
+    return np.array(result)
+
+
 def validation_threshold(labels,scores):
     from sklearn.metrics import matthews_corrcoef
     cuts=np.arange(1,200)/200
-    return float(max(cuts,key=lambda t:(matthews_corrcoef(labels,scores>=t),-abs(t-.5),-t)))
+    def quality(cut):
+        predicted=scores>=cut
+        mcc=0. if predicted.all() or not predicted.any() else matthews_corrcoef(labels,predicted)
+        return mcc,-abs(cut-.5),-cut
+    return float(max(cuts,key=quality))
 
 
 def execute(request):
     import torch
+    torch.set_num_threads(4)
+    torch.backends.cuda.matmul.allow_tf32=False
     from sklearn.metrics import roc_auc_score
     settings=request.get('settings',{})
     device=settings.get('device','cuda')
     batch_size=int(settings.get('batch_size',64))
     if batch_size<=0: raise ValueError('batch_size must be positive')
     payload_path=request['checkpoint'] if request['stage']=='predict' else request['init_checkpoint']
-    payload=torch.load(payload_path,map_location='cpu',weights_only=True)
+    payload=torch.load(payload_path,map_location='cpu')
     saved=payload.get('adapter_metadata',{})
     mask_width=settings.get('mask_width',saved.get('mask_width',20))
     if mask_width not in (20,34): raise ValueError('mask_width must be 20 or 34')
@@ -114,7 +181,7 @@ def execute(request):
         output=Path(request['output'])
         if output.exists(): raise FileExistsError(output)
         pd.DataFrame({'row_id':frame.row_id,'score':scores,'threshold':threshold}).to_csv(output,index=False)
-        write_json(output.with_suffix('.metadata.json'),dict(checkpoint=str(Path(payload_path).resolve()),checkpoint_sha256=sha256(payload_path),rows=len(frame),threshold=threshold,threshold_source='explicit' if request.get('threshold') is not None else ('checkpoint validation' if 'threshold' in saved else 'upstream default 0.5'),mask_width=mask_width,chain=settings.get('chain','beta')))
+        print(json.dumps(dict(rows=len(frame),checkpoint=str(payload_path),threshold=float(threshold))),flush=True)
         return
     if request['stage']!='train': raise ValueError('Unknown stage')
     initialize(model,payload,request.get('init_kind','pretrain'))
@@ -126,12 +193,26 @@ def execute(request):
     train=pd.read_csv(request['train'],keep_default_na=False)
     valid=pd.read_csv(request['valid'],keep_default_na=False)
     if set(train.label)!={0,1} or set(valid.label)!={0,1}: raise ValueError('Train and validation need both labels')
-    train_arrays,valid_arrays=encode(train,vocab),encode(valid,vocab)
-    y=train.label.to_numpy(dtype=np.int64)
-    optimizer=torch.optim.Adam([p for p in model.parameters() if p.requires_grad],lr=float(settings.get('learning_rate',1e-3)))
-    criterion=torch.nn.CrossEntropyLoss()
+    encode(train,vocab); encode(valid,vocab)
     output=Path(request['output'])
-    output.mkdir(parents=True,exist_ok=False)
+    output.mkdir(parents=True,exist_ok=True)
+    if (output/'best.pt').exists(): raise FileExistsError(output/'best.pt')
+    standardize=bool(settings.get('standardize_features',True))
+    features=frozen_features(model,train,valid,vocab,batch_size,device,standardize)
+    if standardize:
+        # No pretrained classifier exists; begin at balanced, unconfident logits.
+        if request.get('init_kind','pretrain')=='pretrain':
+            torch.nn.init.zeros_(model.classifier.weight);torch.nn.init.zeros_(model.classifier.bias)
+        else:
+            with torch.no_grad():
+                model.classifier.bias.add_(model.classifier.weight @ features.mean)
+                model.classifier.weight.mul_(features.scale)
+    train_batch_size=int(settings.get('train_batch_size',2048))
+    if train_batch_size<=0: raise ValueError('train_batch_size must be positive')
+    y=train.label.to_numpy(dtype=np.int64)
+    print(json.dumps(dict(training_rows=len(train),validation_rows=len(valid),train_batch_size=train_batch_size,encoder_batch_size=batch_size,learning_rate=settings.get('learning_rate',1e-4),standardize_features=standardize,initialization='zero linear head' if standardize and request.get('init_kind','pretrain')=='pretrain' else 'checkpoint/random head',allow_tf32=False)),flush=True)
+    optimizer=torch.optim.Adam([p for p in model.parameters() if p.requires_grad],lr=float(settings.get('learning_rate',1e-4)))
+    criterion=torch.nn.CrossEntropyLoss()
     best=-float('inf'); stale=0; history=[]
     epochs=int(settings.get('epochs',35)); patience=int(settings.get('patience',5))
     for epoch in range(1,epochs+1):
@@ -139,28 +220,33 @@ def execute(request):
         # Frozen upstream encoders have zero configured attention dropout.
         order=np.random.RandomState(seed+epoch).permutation(len(train))
         loss_sum=0.
-        for start in range(0,len(order),batch_size):
-            idx=order[start:start+batch_size]
-            batch=[torch.as_tensor(a[idx],device=device) for a in train_arrays]
+        for start in range(0,len(order),train_batch_size):
+            idx=order[start:start+train_batch_size]
+            batch=features(idx,0)
             target=torch.as_tensor(y[idx],device=device)
             optimizer.zero_grad(set_to_none=True)
-            loss=criterion(model(*batch).float(),target)
+            loss=criterion(model.classifier(batch).float(),target)
+            if not torch.isfinite(loss): raise FloatingPointError("Non-finite training loss")
             loss.backward(); optimizer.step()
             loss_sum+=float(loss.detach())*len(idx)
-        scores=predict_scores(model,valid_arrays,batch_size,device)
+        scores=classifier_scores(model,features,len(valid),train_batch_size)
+        validation_loss=0.
+        with torch.no_grad():
+            for start in range(0,len(valid),train_batch_size):
+                idx=np.arange(start,min(len(valid),start+train_batch_size))
+                target=torch.as_tensor(valid.label.to_numpy(dtype=np.int64)[idx],device=device)
+                validation_loss+=float(criterion(model.classifier(features(idx,1)),target))*len(idx)
         auc=float(roc_auc_score(valid.label,scores))
-        history.append(dict(epoch=epoch,train_loss=loss_sum/len(train),validation_auroc=auc))
+        history.append(dict(epoch=epoch,train_loss=loss_sum/len(train),validation_loss=validation_loss/len(valid),validation_auroc=auc))
         print(json.dumps(history[-1]),flush=True)
         if auc>best:
             best=auc; stale=0
             threshold=validation_threshold(valid.label.to_numpy(),scores)
-            metadata=dict(model='tcrlm',chain=settings.get('chain','beta'),mask_width=mask_width,threshold=threshold,best_epoch=epoch,selection_metric='validation AUROC',validation_auroc=auc,threshold_selection='maximum validation MCC; >= classification',seed=seed,init_checkpoint=str(Path(payload_path).resolve()),init_kind=request.get('init_kind','pretrain'))
-            torch.save({'state_dict':model.state_dict(),'adapter_metadata':metadata},output/'best.pt')
-            write_json(output/'selected_threshold.json',metadata)
+            metadata=dict(model='tcrlm',chain=settings.get('chain','beta'),mask_width=mask_width,threshold=threshold,best_epoch=epoch,selection_metric='validation AUROC',validation_auroc=auc,threshold_selection='maximum validation MCC; >= classification',seed=seed,init_checkpoint=str(Path(payload_path).resolve()),init_kind=request.get('init_kind','pretrain'),learning_rate=settings.get('learning_rate',1e-4),train_batch_size=train_batch_size,training_feature_standardization=standardize,allow_tf32=False)
+            torch.save({'state_dict':export_state(model,features),'adapter_metadata':metadata},output/'best.pt')
         else: stale+=1
-        write_json(output/'history.json',history)
+        write_json(Path(request.get('log_dir',str(output)))/'history.json',history)
         if stale>=patience: break
-    write_json(output/'training_result.json',dict(best_checkpoint=str(output/'best.pt'),best_validation_auroc=best,epochs_run=len(history),settings=settings,init_checkpoint_sha256=sha256(payload_path)))
 
 
 if __name__=='__main__':

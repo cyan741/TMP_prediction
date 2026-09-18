@@ -17,7 +17,7 @@ STANDARD_AA = set("ACDEFGHIKLMNPQRSTVWY")
 
 def read_inputs(path: Path, required: list[str]) -> pd.DataFrame:
     """Read prediction inputs; an optional label column is not used for scoring or threshold selection."""
-    frame = pd.read_csv(path, dtype=str, keep_default_na=False)
+    frame = pd.read_csv(path, sep="\t" if path.suffix.lower() == ".tsv" else ",", dtype=str, keep_default_na=False)
     missing = set(required) - set(frame.columns)
     if missing:
         raise ValueError(f"Missing inference columns: {sorted(missing)}")

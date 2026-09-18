@@ -1,0 +1,27 @@
+{
+  "model": "tcrlm",
+  "workflow": "train-predict",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/tcrLM",
+  "python": "/root/miniconda3/envs/baseline-models/bin/python",
+  "input": "/root/TMP_prediction/Agentic-TPH-training-code/workspaces/hitph0630_unseen_seed42/hitph/test_data_fold0.csv",
+  "output": "/root/TMP_prediction/baseline_runs/predictions/tcrLM/hitph0630_unseen_seed42",
+  "settings": {
+    "chain": "beta",
+    "seed": 42,
+    "batch_size": 64,
+    "device": "cuda",
+    "mask_width": 20,
+    "epochs": 35,
+    "patience": 8,
+    "learning_rate": 0.0001,
+    "negative_seed": 42,
+    "unsupported_train": "exclude",
+    "train_batch_size": 2048,
+    "standardize_features": true
+  },
+  "workspace": "/root/TMP_prediction/Agentic-TPH-training-code/workspaces/hitph0630_unseen_seed42/hitph",
+  "init_checkpoint": "/root/TMP_prediction/baseline_runs/checkpoints/tcrLM/pretrained/pretrained_model_tcr.bin",
+  "init_kind": "pretrain",
+  "log_dir": "/root/TMP_prediction/baseline_runs/logs/tcrLM/hitph0630_unseen_seed42",
+  "checkpoint_dir": "/root/TMP_prediction/baseline_runs/checkpoints/tcrLM/hitph0630_unseen_seed42"
+}

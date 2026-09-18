@@ -1,0 +1,3 @@
+{"task": "immrep25", "rows": 8938, "original_data_and_order_preserved": true, "finite_scores": true, "zero_scores": 0, "only_final_outputs": true}
+{"task": "hitph0630_unseen_seed42", "rows": 11834, "original_data_and_order_preserved": true, "finite_scores": true, "zero_scores": 0, "only_final_outputs": true}
+{"epochs": 30, "first_loss": 1.7835703322632512, "last_loss": 0.7566312092066768, "best_epoch": 26, "validation_macro_peptide_auroc": 0.8274799992829112, "gpu_utilization_mean": 73.2992125984252, "gpu_utilization_max": 94, "gpu_nonzero_utilization_median": 77.0, "nvidia_smi_peak_memory_mib": 9372, "gpu_samples": 127}

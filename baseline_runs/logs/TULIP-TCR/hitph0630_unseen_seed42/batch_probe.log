@@ -1,0 +1,10 @@
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+
+libgomp: Invalid value for environment variable OMP_NUM_THREADS
+self.pad_token_id 1
+self.pad_token_id 1
+self.pad_token_id 1
+{"batch_size": 256, "loss": 3.2170116901397705, "samples_per_second": 1908.9498633501503, "peak_mib": 1718.74755859375}
+{"batch_size": 512, "loss": 2.9917845726013184, "samples_per_second": 3910.6661349212854, "peak_mib": 3248.662109375}
+{"batch_size": 1024, "loss": 2.8312206268310547, "samples_per_second": 5812.219619672246, "peak_mib": 6261.3212890625}

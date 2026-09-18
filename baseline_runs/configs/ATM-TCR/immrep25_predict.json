@@ -1,0 +1,21 @@
+{
+  "model": "atm-tcr",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/ATM-TCR",
+  "python": "/root/miniconda3/envs/baseline-models/bin/python",
+  "workflow": "predict",
+  "input": "/root/TMP_prediction/raw_test_sets/immrep2025_dataset.tsv",
+  "checkpoint": "/root/TMP_prediction/baseline_runs/checkpoints/ATM-TCR/pretrained/original.ckpt",
+  "output": "/root/TMP_prediction/baseline_runs/predictions/ATM-TCR/immrep25",
+  "settings": {
+    "chain": "beta",
+    "peptide_column": "peptide",
+    "tcr_column": "tcrb_cdr3",
+    "seed": 42,
+    "batch_size": 32,
+    "device": "cuda",
+    "max_len_pep": 22,
+    "max_len_tcr": 20
+  },
+  "log_dir": "/root/TMP_prediction/baseline_runs/logs/ATM-TCR/immrep25",
+  "checkpoint_dir": "/root/TMP_prediction/baseline_runs/checkpoints/ATM-TCR/immrep25"
+}

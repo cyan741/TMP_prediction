@@ -1,0 +1,21 @@
+{"encoding": "peptide", "completed": 64, "total": 353}
+{"encoding": "tcr", "completed": 64, "total": 2419}
+{"features_abs_mean": 5.793395042419434, "features_abs_max": 45.9153938293457, "features_std": 7.375527858734131}
+{"lr": 0.001, "batch": 64, "initial_loss": 1.7604434490203857}
+{"lr": 0.001, "batch": 64, "epoch": 1, "online_train_loss": 24.83972682566193, "end_train_loss": 8.991155624389648}
+{"lr": 0.001, "batch": 64, "epoch": 3, "online_train_loss": 8.920716855487534, "end_train_loss": 16.735227584838867}
+{"lr": 0.001, "batch": 64, "epoch": 5, "online_train_loss": 7.406124280147804, "end_train_loss": 7.714939117431641}
+{"lr": 0.001, "batch": 64, "epoch": 10, "online_train_loss": 14.554848455252971, "end_train_loss": 9.244328498840332}
+{"lr": 0.001, "batch": 64, "epoch": 15, "online_train_loss": 10.976812066598583, "end_train_loss": 17.53424644470215}
+{"lr": 0.001, "batch": 2048, "initial_loss": 1.7604434490203857}
+{"lr": 0.001, "batch": 2048, "epoch": 1, "online_train_loss": 86.55397603939264, "end_train_loss": 125.41167449951172}
+{"lr": 0.001, "batch": 2048, "epoch": 3, "online_train_loss": 115.30165855210178, "end_train_loss": 134.61221313476562}
+{"lr": 0.001, "batch": 2048, "epoch": 5, "online_train_loss": 41.00313361446975, "end_train_loss": 84.3322982788086}
+{"lr": 0.001, "batch": 2048, "epoch": 10, "online_train_loss": 20.62430685441204, "end_train_loss": 28.101825714111328}
+{"lr": 0.001, "batch": 2048, "epoch": 15, "online_train_loss": 20.06417664796711, "end_train_loss": 11.090720176696777}
+{"lr": 1e-05, "batch": 2048, "initial_loss": 1.7604434490203857}
+{"lr": 1e-05, "batch": 2048, "epoch": 1, "online_train_loss": 1.5189366733730858, "end_train_loss": 1.54550039768219}
+{"lr": 1e-05, "batch": 2048, "epoch": 3, "online_train_loss": 1.2414362552868312, "end_train_loss": 1.3386205434799194}
+{"lr": 1e-05, "batch": 2048, "epoch": 5, "online_train_loss": 1.1977918265677687, "end_train_loss": 1.1867269277572632}
+{"lr": 1e-05, "batch": 2048, "epoch": 10, "online_train_loss": 1.0929953080010986, "end_train_loss": 1.0904293060302734}
+{"lr": 1e-05, "batch": 2048, "epoch": 15, "online_train_loss": 1.0369412527471038, "end_train_loss": 1.0367109775543213}

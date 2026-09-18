@@ -1,0 +1,21 @@
+{
+  "best_checkpoint": "/root/TMP_prediction/baseline_runs/predictions/ATM-TCR/hitph0630_unseen_seed42/model/best.pt",
+  "best_epoch": 7,
+  "best_validation_auroc": 0.7743356885425201,
+  "epochs_run": 11,
+  "settings": {
+    "chain": "beta",
+    "seed": 42,
+    "negative_seed": 42,
+    "batch_size": 32,
+    "epochs": 100,
+    "patience": 4,
+    "learning_rate": 0.001,
+    "device": "cuda",
+    "max_len_pep": 22,
+    "max_len_tcr": 20,
+    "padding": "mid",
+    "unsupported_train": "error"
+  },
+  "initialization": "random from scratch"
+}

@@ -1,0 +1,62 @@
+{
+  "workflow": "train-predict",
+  "model": "tulip-tcr",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/TULIP-TCR",
+  "python": "/root/miniconda3/envs/baseline-models/bin/python3.8",
+  "output": "/root/TMP_prediction/baseline_runs/predictions/TULIP-TCR/hitph0630_unseen_seed42",
+  "input_rows": 11834,
+  "input_peptides": 500,
+  "dependencies": [
+    "torch",
+    "transformers",
+    "tokenizers",
+    "numpy",
+    "pandas",
+    "sklearn"
+  ],
+  "predict_uses_labels": false,
+  "paths_relative_to": "configuration directory",
+  "missing_assets": [],
+  "model_inputs": [
+    "peptide",
+    "alpha CDR3",
+    "beta CDR3",
+    "MHC allele"
+  ],
+  "training_negatives": "none; positive-only language modeling",
+  "score": "exp(official conditional peptide log-likelihood)",
+  "primary_metrics": "macro per-peptide AUROC/AUPRC",
+  "test_projection_conflicts": 0,
+  "training_excluded_csv_rows": [],
+  "training_kept_rows": 106918,
+  "train_source_rows": 106918,
+  "valid_rows": 11691,
+  "train_peptides": 2337,
+  "valid_peptides": 500,
+  "validation_projection_conflicts": 0,
+  "selection_metric": "validation macro per-peptide AUROC",
+  "threshold_selection": "validation MCC; frozen before test",
+  "python_exists": true,
+  "stages": [
+    {
+      "stage": "train",
+      "argv": [
+        "/root/miniconda3/envs/baseline-models/bin/python3.8",
+        "/root/TMP_prediction/Agentic-TPH-training-code/baselines/workers/tulip.py",
+        "--request",
+        "/root/TMP_prediction/baseline_runs/predictions/TULIP-TCR/hitph0630_unseen_seed42/train_request.json"
+      ],
+      "cwd": "/root/TMP_prediction/baseline_runs/repos/TULIP-TCR"
+    },
+    {
+      "stage": "predict",
+      "argv": [
+        "/root/miniconda3/envs/baseline-models/bin/python3.8",
+        "/root/TMP_prediction/Agentic-TPH-training-code/baselines/workers/tulip.py",
+        "--request",
+        "/root/TMP_prediction/baseline_runs/predictions/TULIP-TCR/hitph0630_unseen_seed42/predict_request.json"
+      ],
+      "cwd": "/root/TMP_prediction/baseline_runs/repos/TULIP-TCR"
+    }
+  ]
+}

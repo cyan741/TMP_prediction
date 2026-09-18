@@ -1,0 +1,20 @@
+{
+  "model": "tulip-tcr",
+  "workflow": "predict",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/TULIP-TCR",
+  "python": "/root/miniconda3/envs/baseline-models/bin/python",
+  "input": "/root/TMP_prediction/raw_test_sets/immrep2025_dataset.tsv",
+  "output": "/root/TMP_prediction/baseline_runs/predictions/TULIP-TCR/immrep25",
+  "log_dir": "/root/TMP_prediction/baseline_runs/logs/TULIP-TCR/immrep25",
+  "checkpoint_dir": "/root/TMP_prediction/baseline_runs/checkpoints/TULIP-TCR/immrep25",
+  "settings": {
+    "seed": 42,
+    "device": "cuda",
+    "batch_size": 512,
+    "peptide_column": "peptide",
+    "alpha_column": "tcra_cdr3",
+    "beta_column": "tcrb_cdr3",
+    "mhc_column": "hla"
+  },
+  "checkpoint": "/root/TMP_prediction/baseline_runs/checkpoints/TULIP-TCR/pretrained/pytorch_model.bin"
+}

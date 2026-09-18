@@ -1,0 +1,167 @@
+CUDA wheel download complete; checking official SHA256
+Looking in links: /root/TMP_prediction/baseline_runs/downloads
+Processing ./TMP_prediction/baseline_runs/downloads/torch-1.10.0+cu113-cp38-cp38-linux_x86_64.whl
+Processing ./TMP_prediction/baseline_runs/downloads/torchtext-0.11.0-cp38-cp38-manylinux1_x86_64.whl
+Requirement already satisfied: tqdm in ./TMP_prediction/baseline_runs/envs/atm-tcr/lib/python3.8/site-packages (from torchtext==0.11.0) (4.57.0)
+Requirement already satisfied: requests in ./TMP_prediction/baseline_runs/envs/atm-tcr/lib/python3.8/site-packages (from torchtext==0.11.0) (2.25.1)
+Requirement already satisfied: numpy in ./TMP_prediction/baseline_runs/envs/atm-tcr/lib/python3.8/site-packages (from torchtext==0.11.0) (1.20.1)
+Requirement already satisfied: typing-extensions in ./TMP_prediction/baseline_runs/envs/atm-tcr/lib/python3.8/site-packages (from torch==1.10.0+cu113) (3.7.4.3)
+Requirement already satisfied: chardet<5,>=3.0.2 in ./TMP_prediction/baseline_runs/envs/atm-tcr/lib/python3.8/site-packages (from requests->torchtext==0.11.0) (4.0.0)
+Requirement already satisfied: idna<3,>=2.5 in ./TMP_prediction/baseline_runs/envs/atm-tcr/lib/python3.8/site-packages (from requests->torchtext==0.11.0) (2.10)
+Requirement already satisfied: urllib3<1.27,>=1.21.1 in ./TMP_prediction/baseline_runs/envs/atm-tcr/lib/python3.8/site-packages (from requests->torchtext==0.11.0) (1.26.3)
+Requirement already satisfied: certifi>=2017.4.17 in ./TMP_prediction/baseline_runs/envs/atm-tcr/lib/python3.8/site-packages (from requests->torchtext==0.11.0) (2020.12.5)
+Installing collected packages: torch, torchtext
+Successfully installed torch-1.10.0+cu113 torchtext-0.11.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+No broken requirements found.
+{"torch": "1.10.0+cu113", "cuda": "11.3", "available": true, "gpu": "NVIDIA GeForce RTX 3080 Ti"}
+0.1442837417125702
+
+Running official IMMREP2025 checkpoint prediction
+{
+  "output": "/root/TMP_prediction/baseline_runs/predictions/ATM-TCR/immrep25/predictions.csv",
+  "rows": 8938,
+  "threshold": 0.5
+}
+{
+  "overall": {
+    "rows": 8938,
+    "peptides": 20,
+    "positives": 905,
+    "negatives": 8033,
+    "auroc": 0.5180966221518557,
+    "auprc": 0.10457811613714799,
+    "f1": 0.18634197988353626,
+    "mcc": 0.027508184662427246,
+    "macro_peptide_auroc": 0.5177414240362376,
+    "macro_peptide_auprc": 0.11014965928531786,
+    "macro_eligible_peptides": 20
+  },
+  "distance_reference": null,
+  "threshold_source": "prediction file; must be selected independently of evaluation labels"
+}
+Starting fixed-workspace ATM-TCR training followed by test prediction
+{
+  "output": "/root/TMP_prediction/baseline_runs/predictions/ATM-TCR/hitph0630_unseen_seed42/predictions.csv",
+  "rows": 11834,
+  "threshold": 0.225
+}
+     rows  peptides  positives  negatives     auroc     auprc        f1       mcc  macro_peptide_auroc  macro_peptide_auprc  macro_eligible_peptides
+1  5306.0     300.0     2655.0     2651.0  0.866557  0.874187  0.796018  0.555907             0.940797             0.956662                    300.0
+2   150.0      29.0       75.0       75.0  0.777067  0.758984  0.735294  0.403473             0.760345             0.855914                     29.0
+3   643.0      25.0      322.0      321.0  0.606857  0.544412  0.745052  0.428215             0.829575             0.883716                     25.0
+4   568.0      55.0      284.0      284.0  0.707238  0.675694  0.754410  0.451273             0.670578             0.771676                     55.0
+5  5101.0      79.0     2561.0     2540.0  0.643270  0.555222  0.748053  0.434844             0.633688             0.737820                     79.0
+6    60.0      11.0       30.0       30.0  0.723333  0.664768  0.800000  0.577350             0.842759             0.864660                     11.0
+7     6.0       1.0        3.0        3.0  0.666667  0.638889  0.857143  0.707107             0.666667             0.638889                      1.0
+{
+  "overall": {
+    "rows": 11834,
+    "peptides": 500,
+    "positives": 5930,
+    "negatives": 5904,
+    "auroc": 0.7679074723399004,
+    "auprc": 0.7534408053533976,
+    "f1": 0.7685444133706218,
+    "mcc": 0.48724019330919843,
+    "macro_peptide_auroc": 0.8438176091800859,
+    "macro_peptide_auprc": 0.8895863096816936,
+    "macro_eligible_peptides": 500
+  },
+  "by_edit_distance": {
+    "1": {
+      "rows": 5306,
+      "peptides": 300,
+      "positives": 2655,
+      "negatives": 2651,
+      "auroc": 0.8665570537643117,
+      "auprc": 0.8741868410489796,
+      "f1": 0.79601832832991,
+      "mcc": 0.5559069190982816,
+      "macro_peptide_auroc": 0.940797446548713,
+      "macro_peptide_auprc": 0.9566621859651855,
+      "macro_eligible_peptides": 300
+    },
+    "2": {
+      "rows": 150,
+      "peptides": 29,
+      "positives": 75,
+      "negatives": 75,
+      "auroc": 0.7770666666666667,
+      "auprc": 0.7589843998412162,
+      "f1": 0.7352941176470588,
+      "mcc": 0.4034732923929645,
+      "macro_peptide_auroc": 0.7603448275862069,
+      "macro_peptide_auprc": 0.8559143962439295,
+      "macro_eligible_peptides": 29
+    },
+    "3": {
+      "rows": 643,
+      "peptides": 25,
+      "positives": 322,
+      "negatives": 321,
+      "auroc": 0.6068574524486756,
+      "auprc": 0.5444120525860423,
+      "f1": 0.7450523864959255,
+      "mcc": 0.42821508364336686,
+      "macro_peptide_auroc": 0.8295753258105182,
+      "macro_peptide_auprc": 0.8837157663454953,
+      "macro_eligible_peptides": 25
+    },
+    "4": {
+      "rows": 568,
+      "peptides": 55,
+      "positives": 284,
+      "negatives": 284,
+      "auroc": 0.7072381471930173,
+      "auprc": 0.6756944812342296,
+      "f1": 0.7544097693351425,
+      "mcc": 0.45127284765538583,
+      "macro_peptide_auroc": 0.6705780557293207,
+      "macro_peptide_auprc": 0.7716759692234842,
+      "macro_eligible_peptides": 55
+    },
+    "5": {
+      "rows": 5101,
+      "peptides": 79,
+      "positives": 2561,
+      "negatives": 2540,
+      "auroc": 0.6432698072541791,
+      "auprc": 0.5552216072240841,
+      "f1": 0.7480534743646247,
+      "mcc": 0.4348440891897814,
+      "macro_peptide_auroc": 0.6336883610906904,
+      "macro_peptide_auprc": 0.7378197504400552,
+      "macro_eligible_peptides": 79
+    },
+    "6": {
+      "rows": 60,
+      "peptides": 11,
+      "positives": 30,
+      "negatives": 30,
+      "auroc": 0.7233333333333334,
+      "auprc": 0.6647679211312908,
+      "f1": 0.8,
+      "mcc": 0.5773502691896257,
+      "macro_peptide_auroc": 0.8427588383838384,
+      "macro_peptide_auprc": 0.8646599927849927,
+      "macro_eligible_peptides": 11
+    },
+    "7": {
+      "rows": 6,
+      "peptides": 1,
+      "positives": 3,
+      "negatives": 3,
+      "auroc": 0.6666666666666667,
+      "auprc": 0.6388888888888888,
+      "f1": 0.8571428571428571,
+      "mcc": 0.7071067811865476,
+      "macro_peptide_auroc": 0.6666666666666667,
+      "macro_peptide_auprc": 0.6388888888888888,
+      "macro_eligible_peptides": 1
+    }
+  },
+  "threshold_source": "prediction CSV; must be frozen on validation data",
+  "aggregation": "row-pooled and equally weighted per-peptide metrics; single-label groups return null AUC"
+}
+Both ATM-TCR workflows completed

@@ -1,0 +1,1 @@
+PASS: TULIP requires a working CUDA GPU; CPU fallback is disabled

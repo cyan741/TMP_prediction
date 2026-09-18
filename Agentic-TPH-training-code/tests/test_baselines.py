@@ -31,7 +31,7 @@ class BaselineTests(unittest.TestCase):
     def config(self,root,workflow='predict'):
         source=root/'input.csv'; self.frame().to_csv(source,index=False)
         checkpoint=root/'weights.bin'; checkpoint.touch()
-        return dict(model='tcrlm',workflow=workflow,repo=str(self.repo),python=sys.executable,input=str(source),checkpoint=str(checkpoint),output=str(root/'out'),settings={'chain':'beta'})
+        return dict(model='tcrlm',workflow=workflow,repo=str(self.repo),python=sys.executable,input=str(source),checkpoint=str(checkpoint),output=str(root/'out'),log_dir=str(root/'logs'),checkpoint_dir=str(root/'checkpoints'),settings={'chain':'beta'})
 
     def test_cdr3_identity_preferred_and_labels_not_converted(self):
         f=self.frame(); f['cdr3_ab']=['CAGF/CATF','CAGF/CAWF']
@@ -103,33 +103,27 @@ class BaselineTests(unittest.TestCase):
             self.assertEqual(info['training_prepared_rows'],4)
             self.assertEqual([s['stage'] for s in info['stages']],['train','predict'])
             request=json.loads((root/'out/predict_request.json').read_text())
-            self.assertEqual(request['checkpoint'],str(root/'out/model/best.pt'))
+            self.assertEqual(request['checkpoint'],str(root/'checkpoints/best.pt'))
             self.assertNotIn('label',pd.read_csv(root/'out/data/input.csv'))
             valid.loc[0,'pep']=train.pep.iloc[0]; valid.to_csv(root/'valid.csv',index=False)
             with self.assertRaises(ValueError): baseline.plan(cfg)
 
-    def test_run_restores_row_order_from_mock_worker_and_can_follow_prepare(self):
+    def test_run_restores_row_order_and_outputs_only_final_files(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d); cfg=self.config(root)
-            baseline.prepare(cfg)
-            calls=[]
+            cfg['run_dir']=str(root/'runs')
             def mock_run(argv,**kwargs):
-                calls.append(argv)
-                if argv[0]=='git':
-                    if prepared['repo_commit'] is None:
-                        raise baseline.subprocess.CalledProcessError(1,argv)
-                    return SimpleNamespace(stdout=prepared['repo_commit'],returncode=0)
-                if '-c' in argv: return SimpleNamespace(stdout='[]',returncode=0)
                 request=json.loads(Path(argv[-1]).read_text())
                 pd.DataFrame({'row_id':[1,0],'score':[.8,.2],'threshold':[.5,.5]}).to_csv(request['output'],index=False)
                 return SimpleNamespace(returncode=0)
-            # Match the already prepared repo commit without invoking any model.
-            prepared=json.loads((root/'out/plan.json').read_text())
             with patch('baseline.subprocess.run',side_effect=mock_run): baseline.run(cfg)
             p=pd.read_csv(root/'out/predictions.csv')
             self.assertEqual(p.score.tolist(),[.2,.8])
             self.assertEqual(p.label.tolist(),[1,1])
             self.assertEqual(p.pep.tolist(),self.frame().pep.tolist())
+            self.assertEqual({f.name for f in (root/'out').iterdir()},{'predictions.csv','metrics.json'})
+            self.assertNotIn('input_sha256',json.dumps(baseline.plan(cfg)))
+            self.assertNotIn('repo_commit',json.dumps(baseline.plan(cfg)))
 
     def test_evaluate_new_labeled_predictions_and_reject_unlabeled(self):
         with tempfile.TemporaryDirectory() as d:

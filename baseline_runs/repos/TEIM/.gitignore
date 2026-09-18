@@ -1,0 +1,5 @@
+.history/*
+outputs/*
+__pycache__/*
+*.pyc
+train_teim/.gitignore

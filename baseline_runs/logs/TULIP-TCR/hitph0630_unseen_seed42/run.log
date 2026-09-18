@@ -1,0 +1,13 @@
+     rows  peptides  positives  negatives     auroc     auprc        f1       mcc  macro_peptide_auroc  macro_peptide_auprc  macro_eligible_peptides
+1  5306.0     300.0     2655.0     2651.0  0.721459  0.704444  0.690687  0.233075             0.933629             0.946851                    300.0
+2   150.0      29.0       75.0       75.0  0.633778  0.624046  0.719212  0.339200             0.772682             0.845942                     29.0
+3   643.0      25.0      322.0      321.0  0.663077  0.611128  0.740306  0.407934             0.814399             0.859411                     25.0
+4   568.0      55.0      284.0      284.0  0.682652  0.617081  0.739191  0.401200             0.698157             0.788029                     55.0
+5  5101.0      79.0     2561.0     2540.0  0.622866  0.572500  0.346006  0.087954             0.674592             0.757626                     79.0
+6    60.0      11.0       30.0       30.0  0.751111  0.653890  0.603774  0.308516             0.901338             0.920050                     11.0
+7     6.0       1.0        3.0        3.0  0.333333  0.477778  0.750000  0.447214             0.333333             0.477778                      1.0
+{
+  "predictions": "/root/TMP_prediction/baseline_runs/predictions/TULIP-TCR/hitph0630_unseen_seed42/predictions.csv",
+  "metrics": "/root/TMP_prediction/baseline_runs/predictions/TULIP-TCR/hitph0630_unseen_seed42/metrics.json",
+  "rows": 11834
+}

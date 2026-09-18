@@ -1,0 +1,20 @@
+{
+  "model": "tulip-tcr",
+  "workflow": "train-predict",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/TULIP-TCR",
+  "python": "/root/miniconda3/envs/baseline-models/bin/python",
+  "input": "/root/TMP_prediction/Agentic-TPH-training-code/workspaces/hitph0630_unseen_seed42/hitph/test_data_fold0.csv",
+  "output": "/root/TMP_prediction/baseline_runs/predictions/TULIP-TCR/hitph0630_unseen_seed42",
+  "log_dir": "/root/TMP_prediction/baseline_runs/logs/TULIP-TCR/hitph0630_unseen_seed42",
+  "checkpoint_dir": "/root/TMP_prediction/baseline_runs/checkpoints/TULIP-TCR/hitph0630_unseen_seed42",
+  "settings": {
+    "seed": 42,
+    "device": "cuda",
+    "batch_size": 1024,
+    "learning_rate": 0.0001,
+    "epochs": 30,
+    "patience": 4,
+    "weight_decay": 0.0
+  },
+  "workspace": "/root/TMP_prediction/Agentic-TPH-training-code/workspaces/hitph0630_unseen_seed42/hitph"
+}

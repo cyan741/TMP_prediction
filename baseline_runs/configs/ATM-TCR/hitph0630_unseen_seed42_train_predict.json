@@ -1,0 +1,25 @@
+{
+  "model": "atm-tcr",
+  "repo": "/root/TMP_prediction/baseline_runs/repos/ATM-TCR",
+  "python": "/root/miniconda3/envs/baseline-models/bin/python",
+  "workflow": "train-predict",
+  "workspace": "/root/TMP_prediction/Agentic-TPH-training-code/workspaces/hitph0630_unseen_seed42/hitph",
+  "input": "/root/TMP_prediction/Agentic-TPH-training-code/workspaces/hitph0630_unseen_seed42/hitph/test_data_fold0.csv",
+  "output": "/root/TMP_prediction/baseline_runs/predictions/ATM-TCR/hitph0630_unseen_seed42",
+  "settings": {
+    "chain": "beta",
+    "seed": 42,
+    "negative_seed": 42,
+    "batch_size": 32,
+    "epochs": 100,
+    "patience": 4,
+    "learning_rate": 0.001,
+    "device": "cuda",
+    "max_len_pep": 22,
+    "max_len_tcr": 20,
+    "padding": "mid",
+    "unsupported_train": "error"
+  },
+  "log_dir": "/root/TMP_prediction/baseline_runs/logs/ATM-TCR/hitph0630_unseen_seed42",
+  "checkpoint_dir": "/root/TMP_prediction/baseline_runs/checkpoints/ATM-TCR/hitph0630_unseen_seed42"
+}

@@ -1,0 +1,2 @@
+{"torch": "1.10.0+cu113", "cuda": "11.3", "available": true, "gpu": "NVIDIA GeForce RTX 3080 Ti"}
+0.1442837417125702

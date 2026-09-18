@@ -1,0 +1,5 @@
+self.pad_token_id 1
+self.pad_token_id 1
+self.pad_token_id 1
+{"device": "cuda:0", "gpu": "NVIDIA GeForce RTX 3080 Ti", "parameters": 10956220, "batch_size": 512, "training_objective": "positive-only LM + MLM per token", "score": "exp(official peptide log-likelihood)"}
+{"rows": 8938, "threshold": 0.5}

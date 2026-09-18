@@ -1,0 +1,12 @@
+
+/envs/
+/downloads/
+
+# Local model weights
+/checkpoints/
+/repos/tcrLM/pretrained_model/
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors

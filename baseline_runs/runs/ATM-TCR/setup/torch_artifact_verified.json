@@ -1,0 +1,5 @@
+{
+  "path": "/root/TMP_prediction/baseline_runs/downloads/torch-1.10.0+cu113-cp38-cp38-linux_x86_64.whl",
+  "sha256": "cccddc32b8941bd03ede29ff0a1cce2f2b51113a5ee23bb8b979316ac2114183",
+  "official_index": "https://download.pytorch.org/whl/cu113/torch/"
+}

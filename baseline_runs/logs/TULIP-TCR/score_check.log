@@ -1,0 +1,4 @@
+self.pad_token_id 1
+self.pad_token_id 1
+self.pad_token_id 1
+{"strict_checkpoint_load": true, "official_score_equivalence": true, "max_logscore_error": 3.814697265625e-06, "special_tokens_not_masked": true, "unknown_mhc_missing": true}

@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-"""Plan, prepare or explicitly run an external baseline; planning runs no model."""
+"""Run external baselines on original inputs and existing workspace splits."""
 import argparse
 import json
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
 from baselines.adapters import get_adapter
-from baselines.provenance import sha256
 from baselines.data import read_csv, labels, projection_conflicts
 from inference import read_inputs, write_predictions
 from core_engine.trainer.workspaces import write_json
 
 
-PATH_KEYS = ('repo','python','input','workspace','train','valid','negative_exclusion','checkpoint','init_checkpoint','output')
+PATH_KEYS = ('repo','python','input','workspace','train','valid','negative_exclusion','checkpoint','init_checkpoint','output','run_dir','log_dir','checkpoint_dir')
 
 
 def load_config(path):
@@ -61,7 +61,7 @@ def plan(cfg):
         info['test_projection_conflicts']=projection_conflicts(converted,original.label.astype(int))
     stages=[]
     if cfg['workflow']=='train-predict':
-        for k in ['train','valid','init_checkpoint']:
+        for k in ['train','valid'] + (['init_checkpoint'] if getattr(adapter, 'requires_init_checkpoint', True) else []):
             if not cfg.get(k): raise ValueError(f'train-predict requires {k}')
         train,valid=read_csv(cfg['train']),read_csv(cfg['valid'])
         train,ct,excluded_train_rows=adapter.training_input(train,settings)
@@ -71,12 +71,14 @@ def plan(cfg):
         sets=[set(f.peptide) for f in [ct,cv,converted]]
         if any(sets[i]&sets[j] for i,j in [(0,1),(0,2),(1,2)]):
             raise ValueError('Unseen-peptide train/validation/test overlap')
-        if set(labels(train))=={1} and not cfg.get('negative_exclusion'):
+        if adapter.uses_negative_exclusion and set(labels(train))=={1} and not cfg.get('negative_exclusion'):
             raise ValueError('Positive-only train requires negative_exclusion')
-        if cfg.get('negative_exclusion'):
+        if adapter.uses_negative_exclusion and cfg.get('negative_exclusion'):
             exclusion=read_csv(cfg['negative_exclusion'])
             adapter.convert_exclusions(exclusion,settings)
-        info.update(training_excluded_csv_rows=excluded_train_rows,training_kept_rows=len(train),train_source_rows=len(train)+len(excluded_train_rows),valid_rows=len(valid),train_peptides=len(sets[0]),valid_peptides=len(sets[1]),validation_projection_conflicts=projection_conflicts(cv,vy),training_negatives='fixed 1:1 if train is positive-only; exclusion projected to selected chain',selection_metric='validation AUROC',threshold_selection='validation MCC; frozen before test')
+        info.update(training_excluded_csv_rows=excluded_train_rows,training_kept_rows=len(train),train_source_rows=len(train)+len(excluded_train_rows),valid_rows=len(valid),train_peptides=len(sets[0]),valid_peptides=len(sets[1]),validation_projection_conflicts=projection_conflicts(cv,vy),training_negatives=('dynamic 1:1 per epoch; exclusion projected to selected chain' if getattr(adapter, 'dynamic_negatives', False) else 'fixed 1:1 if train is positive-only; exclusion projected to selected chain'),selection_metric='validation AUROC',threshold_selection='validation MCC; frozen before test')
+        if not adapter.uses_negative_exclusion:
+            info.update(training_negatives='none; positive-only language modeling',selection_metric='validation macro per-peptide AUROC')
         stages.append('train')
     else:
         if not cfg.get('checkpoint'): raise ValueError('predict requires a finetuned checkpoint')
@@ -86,88 +88,74 @@ def plan(cfg):
     info['python_exists']=Path(cfg['python']).is_file()
     stages.append('predict')
     info['stages']=[dict(stage=s,argv=[cfg['python'],str(adapter.worker.resolve()),'--request',str(Path(cfg['output'])/f'{s}_request.json')],cwd=str(repo)) for s in stages]
-    info['input_sha256']=sha256(Path(cfg['input']))
-    try:
-        info['repo_commit']=subprocess.run(['git','-C',str(repo),'rev-parse','HEAD'],capture_output=True,text=True,check=True).stdout.strip()
-    except (subprocess.CalledProcessError,FileNotFoundError):
-        info['repo_commit']=None
     return info
 
 
 def prepare(cfg):
     info=plan(cfg)
     output=Path(cfg['output'])
-    if output.exists(): raise FileExistsError(output)
+    if output.exists() and any(output.iterdir()): raise FileExistsError(output)
     adapter=get_adapter(cfg['model']); settings=cfg['settings']
     source=read_inputs(Path(cfg['input']),[])
     converted=adapter.convert(source,settings)
-    output.mkdir(parents=True)
+    output.mkdir(parents=True,exist_ok=True)
     (output/'data').mkdir()
     # Outcome labels never enter the prediction request or worker input.
     converted.to_csv(output/'data/input.csv',index=False)
-    source.to_csv(output/'data/original_input.csv',index=False)
     common=dict(model=adapter.name,repo=cfg['repo'],settings=settings)
     checkpoint=cfg.get('checkpoint')
     if cfg['workflow']=='train-predict':
         train,valid=read_csv(cfg['train']),read_csv(cfg['valid'])
         train,ct,excluded_train_rows=adapter.training_input(train,settings)
         cv=adapter.convert(valid,settings)
-        exclusion=adapter.convert_exclusions(read_csv(cfg['negative_exclusion']),settings) if cfg.get('negative_exclusion') else None
+        exclusion=adapter.convert_exclusions(read_csv(cfg['negative_exclusion']),settings) if adapter.uses_negative_exclusion and cfg.get('negative_exclusion') else None
         train_data,valid_data=adapter.prepare_training(train,valid,ct,cv,exclusion,int(settings.get('negative_seed',settings.get('seed',42))))
-        if excluded_train_rows:
-            read_csv(cfg['train']).iloc[np.array(excluded_train_rows)-2].to_csv(output/'data/excluded_train.csv',index=False)
         train_data.to_csv(output/'data/train.csv',index=False)
         valid_data.to_csv(output/'data/valid.csv',index=False)
-        checkpoint=str(output/'model/best.pt')
-        write_json(output/'train_request.json',dict(**common,stage='train',train=str(output/'data/train.csv'),valid=str(output/'data/valid.csv'),init_checkpoint=cfg['init_checkpoint'],init_kind=cfg.get('init_kind','pretrain'),output=str(output/'model')))
+        model_output=Path(cfg.get('checkpoint_dir',Path(cfg.get('run_dir',str(output)))/'model'))
+        checkpoint=str(model_output/'best.pt')
+        request=dict(**common,log_dir=cfg.get('log_dir',str(model_output)),stage='train',train=str(output/'data/train.csv'),valid=str(output/'data/valid.csv'),init_checkpoint=cfg.get('init_checkpoint'),init_kind=cfg.get('init_kind','pretrain'),output=str(model_output))
+        if exclusion is not None and getattr(adapter,'dynamic_negatives',False):
+            exclusion.to_csv(output/'data/exclusion.csv',index=False)
+            request['negative_exclusion']=str(output/'data/exclusion.csv')
+        write_json(output/'train_request.json',request)
         info['training_prepared_rows']=len(train_data)
-        info['train_sha256']=sha256(Path(cfg['train']))
-        info['valid_sha256']=sha256(Path(cfg['valid']))
-    write_json(output/'predict_request.json',dict(**common,stage='predict',input=str(output/'data/input.csv'),checkpoint=checkpoint,threshold=cfg.get('threshold'),output=str(output/'worker_predictions.csv')))
-    write_json(output/'resolved_config.json',cfg)
-    write_json(output/'plan.json',info)
+    write_json(output/'predict_request.json',dict(**common,log_dir=cfg.get('log_dir'),stage='predict',input=str(output/'data/input.csv'),checkpoint=checkpoint,threshold=cfg.get('threshold'),output=str(output/'worker_predictions.csv')))
     return info
 
 
 def run(cfg):
     info=plan(cfg)
-    if info['missing_assets']: raise FileNotFoundError(f"Missing local weights: {info['missing_assets']}")
-    if not info['python_exists']: raise FileNotFoundError(cfg['python'])
-    dependency_probe = subprocess.run([cfg['python'],'-c','import importlib.util,json; print(json.dumps([m for m in '+repr(info['dependencies'])+' if importlib.util.find_spec(m) is None]))'],capture_output=True,text=True,check=True)
-    missing_dependencies=json.loads(dependency_probe.stdout)
-    if missing_dependencies:
-        raise RuntimeError(f'External Python missing dependencies: {missing_dependencies}')
-    # Only explicit `run` may invoke an external model process.
+    if info['missing_assets']: raise FileNotFoundError(info['missing_assets'])
     output=Path(cfg['output'])
-    if output.exists():
-        if (output/'predictions.csv').exists():
-            raise FileExistsError(output/'predictions.csv')
-        if json.loads((output/'resolved_config.json').read_text()) != cfg:
-            raise ValueError('Prepared configuration differs; use a new output directory')
-        prepared=json.loads((output/'plan.json').read_text())
-        if prepared['input_sha256'] != info['input_sha256'] or prepared['repo_commit'] != info['repo_commit']:
-            raise ValueError('Input or repo changed since prepare')
-        for key in ['train','valid']:
-            if cfg.get(key) and prepared.get(key+'_sha256') != sha256(cfg[key]):
-                raise ValueError(f'{key} changed since prepare')
-    else:
-        info=prepare(cfg)
-    for stage in info['stages']:
-        with (output/f"{stage['stage']}.log").open('w') as log:
-            subprocess.run(stage['argv'],cwd=stage['cwd'],stdout=log,stderr=subprocess.STDOUT,check=True)
-    predictions=read_csv(output/'worker_predictions.csv')
-    ids=predictions.row_id.astype(int)
-    original=read_csv(output/'data/original_input.csv')
-    if ids.duplicated().any() or set(ids)!=set(range(len(original))):
-        raise ValueError('Worker predictions must cover each input row exactly once')
-    predictions=predictions.assign(row_id=ids).sort_values('row_id')
-    scores=predictions.score.astype(float).to_numpy()
-    cuts=predictions.threshold.astype(float).to_numpy()
-    if not np.isfinite(scores).all() or ((scores<0)|(scores>1)).any(): raise ValueError('Invalid prediction scores')
-    if not np.isfinite(cuts).all() or ((cuts<0)|(cuts>1)).any() or len(np.unique(cuts))!=1: raise ValueError('Expected one frozen probability threshold')
-    result=write_predictions(original,scores.tolist(),float(cuts[0]),output/'predictions.csv')
-    write_json(output/'result.json',dict(**result,model=cfg['model'],workflow=cfg['workflow'],input_sha256=info['input_sha256'],repo_commit=info['repo_commit']))
-    return result
+    output.mkdir(parents=True,exist_ok=True)
+    if any(output.iterdir()): raise FileExistsError(output)
+    base=output.parents[2]
+    log_dir=Path(cfg.get('log_dir',cfg.get('run_dir',base/'logs'/output.parent.name/output.name)))
+    checkpoint_dir=Path(cfg.get('checkpoint_dir',base/'checkpoints'/output.parent.name/output.name))
+    log_dir.mkdir(parents=True,exist_ok=True)
+    original=read_inputs(Path(cfg['input']),[])
+    with tempfile.TemporaryDirectory(prefix='baseline-') as temp:
+        staged=dict(cfg,output=str(Path(temp)/'data'),log_dir=str(log_dir),checkpoint_dir=str(checkpoint_dir))
+        prepared=prepare(staged)
+        for stage in prepared['stages']:
+            with (log_dir/(stage['stage']+'.log')).open('w') as log:
+                subprocess.run(stage['argv'],cwd=stage['cwd'],stdout=log,stderr=subprocess.STDOUT,check=True)
+        predictions=read_csv(Path(staged['output'])/'worker_predictions.csv')
+        ids=predictions.row_id.astype(int)
+        if ids.duplicated().any() or set(ids)!=set(range(len(original))):
+            raise ValueError('Worker must predict every input row exactly once')
+        predictions=predictions.assign(row_id=ids).sort_values('row_id')
+        scores=predictions.score.astype(float).to_numpy()
+        cuts=predictions.threshold.astype(float).to_numpy()
+        if not np.isfinite(scores).all() or ((scores<0)|(scores>1)).any():
+            raise ValueError('Invalid prediction scores')
+        if not np.isfinite(cuts).all() or ((cuts<0)|(cuts>1)).any() or len(np.unique(cuts))!=1:
+            raise ValueError('Expected one frozen probability threshold')
+        write_predictions(original,scores.tolist(),float(cuts[0]),output/'predictions.csv')
+    benchmark=Path(cfg['workspace']).parent if cfg.get('workspace') else None
+    evaluate(output/'predictions.csv',output/'metrics.json',benchmark,cfg['settings'].get('peptide_column','pep'))
+    return dict(predictions=str(output/'predictions.csv'),metrics=str(output/'metrics.json'),rows=len(original))
 
 
 def evaluate(predictions, output, benchmark=None, peptide_column='pep'):
@@ -197,7 +185,7 @@ def evaluate(predictions, output, benchmark=None, peptide_column='pep'):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     sub=p.add_subparsers(dest='command',required=True)
-    for command in ['plan','prepare','run']:
+    for command in ['plan','run']:
         q=sub.add_parser(command)
         q.add_argument('--config',type=Path,required=True)
     q=sub.add_parser('evaluate')
@@ -210,7 +198,7 @@ def main():
         result=evaluate(a.predictions,a.output,a.benchmark,a.peptide_column)
     else:
         cfg=load_config(a.config)
-        result={'plan':plan,'prepare':prepare,'run':run}[a.command](cfg)
+        result={'plan':plan,'run':run}[a.command](cfg)
     print(json.dumps(result,indent=2,ensure_ascii=False))
 
 

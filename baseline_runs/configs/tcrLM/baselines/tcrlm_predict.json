@@ -2,9 +2,19 @@
   "model": "tcrlm",
   "workflow": "predict",
   "repo": "/root/TMP_prediction/baseline_runs/repos/tcrLM",
-  "python": "/opt/conda/bin/python",
-  "input": "../../workspaces/unseen_full_seed42_original/hitph/test_data_fold0.csv",
-  "checkpoint": "/root/TMP_prediction/baseline_runs/repos/tcrLM/pretrained_model/finetuned_model.bin",
-  "output": "../../outputs/baselines/tcrlm_direct",
-  "settings": {"chain": "beta", "batch_size": 64, "device": "cuda", "mask_width": 20}
+  "python": "/root/miniconda3/envs/baseline-models/bin/python",
+  "input": "/root/TMP_prediction/raw_test_sets/immrep2025_dataset.tsv",
+  "output": "/root/TMP_prediction/baseline_runs/predictions/tcrLM/immrep25",
+  "settings": {
+    "chain": "beta",
+    "seed": 42,
+    "batch_size": 64,
+    "device": "cuda",
+    "mask_width": 20,
+    "peptide_column": "peptide",
+    "tcr_column": "tcrb_cdr3"
+  },
+  "checkpoint": "/root/TMP_prediction/baseline_runs/checkpoints/tcrLM/pretrained/finetuned_model.bin",
+  "log_dir": "/root/TMP_prediction/baseline_runs/logs/tcrLM/immrep25",
+  "checkpoint_dir": "/root/TMP_prediction/baseline_runs/checkpoints/tcrLM/immrep25"
 }

@@ -64,8 +64,6 @@
       "cwd": "/root/TMP_prediction/baseline_runs/repos/tcrLM"
     }
   ],
-  "input_sha256": "fabc7666a45b90c09be93ba05c71f3f02fe9975afcac7cc26d8ecc0d03e5dbb4",
-  "repo_commit": "6c96f6997666214ebc7ac5dae213d127414417e9",
   "training_prepared_rows": 213834,
   "train_sha256": "64844ea48b1b60290ca4b4dced4c676642ffbd3e4130ae3fda017e40304ab16d",
   "valid_sha256": "d6e71e59fb5018ecce74928332ddb1d47771aeccb14723dcc50f74ef4faeff0a"

@@ -1,0 +1,17 @@
+{
+  "overall": {
+    "rows": 8938,
+    "peptides": 20,
+    "positives": 905,
+    "negatives": 8033,
+    "auroc": 0.496020558841189,
+    "auprc": 0.10053284929582897,
+    "f1": 0.10842824601366743,
+    "mcc": -0.012259775587046069,
+    "macro_peptide_auroc": 0.4914187397319448,
+    "macro_peptide_auprc": 0.11106932356134318,
+    "macro_eligible_peptides": 20
+  },
+  "distance_reference": null,
+  "threshold_source": "prediction file; must be selected independently of evaluation labels"
+}

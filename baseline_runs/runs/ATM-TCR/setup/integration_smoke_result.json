@@ -1,0 +1,8 @@
+{
+  "rows": 2,
+  "threshold": 0.005,
+  "real_upstream_model": true,
+  "scratch_training_and_prediction_succeeded": true,
+  "original_fields_and_row_order_preserved": true,
+  "temporary_output_validated_before_cleanup": true
+}
